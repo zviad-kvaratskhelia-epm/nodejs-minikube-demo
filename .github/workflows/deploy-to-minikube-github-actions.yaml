@@ -16,24 +16,12 @@ jobs:
       run: |
           export SHELL=/bin/bash
           eval $(minikube -p minikube docker-env)
-          docker build -f ./Dockerfile -t localhost/node-app:latest .  # Changed image name
+          docker build -f ./Dockerfile -t devopshint/node-app:latest .
           echo -n "verifying images:"
           docker images         
     - name: Deploy to minikube
       run:
         kubectl apply -f k8s-node-app.yaml
-    - name: Debug deployment
-      run: |
-          echo "Checking pods:"
-          kubectl get pods
-          echo "Checking deployment:"
-          kubectl describe deployment nodejs-app
-          echo "Checking events:"
-          kubectl get events --sort-by='.lastTimestamp'
-    - name: Wait for pod to be ready
-      run: |
-          echo "Waiting for pod to be ready..."
-          kubectl wait --for=condition=Ready pods --selector=app=nodejs-app --timeout=60s
     - name: Test service URLs
       run: |
           minikube service list
